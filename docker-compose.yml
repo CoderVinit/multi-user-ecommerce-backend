@@ -1,0 +1,62 @@
+version: '3.9'
+
+services:
+  db:
+    image: mysql:8.0
+    container_name: mv_mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-Vinit@7521}
+      MYSQL_DATABASE: ${DB_NAME:-multi_vendor_ecommerce}
+      MYSQL_USER: ${DB_USER:-root}
+      MYSQL_PASSWORD: ${DB_PASS:-Vinit@7521}
+    command: ["--default-authentication-plugin=mysql_native_password","--character-set-server=utf8mb4","--collation-server=utf8mb4_unicode_ci"]
+    volumes:
+      - db_data:/var/lib/mysql
+    ports:
+      - "3306:3306"
+    healthcheck:
+      test: ["CMD","mysqladmin","ping","-h","127.0.0.1","-u$$MYSQL_USER","-p$$MYSQL_PASSWORD"]
+      interval: 20s
+      timeout: 5s
+      retries: 10
+
+  backend:
+    build:
+      context: ./Backend
+      dockerfile: Dockerfile
+      target: prod
+    container_name: mv_backend
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      NODE_ENV: production
+      PORT: 5600
+      DB_HOST: db
+      DB_PORT: 3306
+      DB_NAME: ${DB_NAME:-multi_vendor_ecommerce}
+      DB_USER: ${DB_USER:-root}
+      DB_PASS: ${DB_PASS:-Vinit@7521}
+      JWT_SECRET: ${JWT_SECRET:-devsecret}
+    ports:
+      - "5600:5600"
+    # If you want live reload in dev: swap target to dev and mount code
+    # volumes:
+    #   - ./Backend:/app
+
+  adminer:
+    image: adminer:4
+    container_name: mv_adminer
+    restart: unless-stopped
+    environment:
+      ADMINER_DESIGN: dracula
+    depends_on:
+      - db
+    ports:
+      - "8080:8080"
+
+volumes:
+  db_data:
+    driver: local
