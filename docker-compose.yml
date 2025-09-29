@@ -1,3 +1,5 @@
+version: '3.9'
+
 services:
   db:
     image: mysql:8.0
@@ -24,7 +26,8 @@ services:
     container_name: mv_backend
     restart: unless-stopped
     depends_on:
-      - db   # simpler, no healthcheck
+      db:
+        condition: service_healthy
     environment:
       NODE_ENV: production
       PORT: 5600
@@ -36,3 +39,16 @@ services:
       JWT_SECRET: ${JWT_SECRET:-devsecret}
     ports:
       - "5600:5600"
+
+  adminer:
+    image: adminer:4
+    container_name: mv_adminer
+    restart: unless-stopped
+    depends_on:
+      - db
+    ports:
+      - "8080:8080"
+
+volumes:
+  db_data:
+    driver: local
