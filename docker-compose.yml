@@ -17,6 +17,12 @@ services:
       - db_data:/var/lib/mysql
     ports:
       - "3307:3306"
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -uroot -p${DB_ROOT_PASSWORD:-Vinit@7521} || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 20
+      start_period: 40s
 
   backend:
     build:
