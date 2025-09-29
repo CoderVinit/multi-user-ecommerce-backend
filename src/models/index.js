@@ -15,11 +15,18 @@ const configPath = path.join(__dirname, '/../config/config.json');
 const config = JSON.parse(readFileSync(configPath, 'utf8'))[env];
 const db = {};
 
+// Allow environment variables to override JSON config (useful inside containers)
+const dbName = process.env.DB_NAME || process.env.MYSQL_DB || config.database;
+const dbUser = process.env.DB_USER || process.env.MYSQL_USER || config.username;
+const dbPass = process.env.DB_PASS || process.env.MYSQL_PASSWORD || config.password;
+const dbHost = process.env.DB_HOST || process.env.MYSQL_HOST || config.host;
+const dbPort = Number(process.env.DB_PORT || process.env.MYSQL_PORT || config.port || 3306);
+
 let sequelize;
-if (config.use_env_variable) {
-  sequelize = new Sequelize(process.env[config.use_env_variable], config);
+if (config.use_env_variable && process.env[config.use_env_variable]) {
+  sequelize = new Sequelize(process.env[config.use_env_variable], { ...config, host: dbHost, port: dbPort });
 } else {
-  sequelize = new Sequelize(config.database, config.username, config.password, config);
+  sequelize = new Sequelize(dbName, dbUser, dbPass, { ...config, host: dbHost, port: dbPort });
 }
 
 // For now, we'll manually import models since there are model files
