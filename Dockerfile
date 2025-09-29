@@ -23,6 +23,8 @@ WORKDIR /app
 # Copy installed node_modules from base layer
 COPY --from=base /app/node_modules ./node_modules
 COPY package*.json ./
+# Copy sequelize configuration helper so CLI paths resolve
+COPY .sequelizerc ./
 # Copy only necessary source files
 COPY src ./src
 EXPOSE 5600
