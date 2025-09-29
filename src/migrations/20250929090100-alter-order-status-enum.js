@@ -1,4 +1,3 @@
-"use strict";
 
 /**
  * Migration: Align the orders.status ENUM with application code.
@@ -7,7 +6,7 @@
  *
  * Safe for MySQL. If using a different dialect, adjust raw SQL accordingly.
  */
-module.exports = {
+export default {
   async up (queryInterface, Sequelize) {
     // 1. If table does not exist (fresh environment), create with correct schema
     const tables = await queryInterface.showAllTables();
