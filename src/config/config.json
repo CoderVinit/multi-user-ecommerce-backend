@@ -19,7 +19,7 @@
     "username": "root",
     "password": "Vinit@7521",
     "database": "multi_vendor_ecommerce_production",
-    "host": "localhost",
+  "host": "db",
     "port": 3306,
     "dialect": "mysql"
   }
