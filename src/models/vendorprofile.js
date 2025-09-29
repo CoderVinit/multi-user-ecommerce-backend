@@ -28,7 +28,8 @@ export default (sequelize, DataTypes) => {
       allowNull: false,
       unique: true,
       references: {
-        model: 'Users',
+        // Reference the actual table name defined in User model (tableName: 'users')
+        model: 'users',
         key: 'id'
       }
     },
